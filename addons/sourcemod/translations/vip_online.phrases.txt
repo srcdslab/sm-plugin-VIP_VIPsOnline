@@ -1,0 +1,28 @@
+"Phrases"
+{
+	"VIP_PLAYERS_ONLINE"
+	{
+		"en"	"VIP-players online"
+	}
+
+	"EXPIRES"
+	{
+		"en"		"Expires"
+		"fi"		"Päättyy"
+		"de"		"Läuft ab"
+		"pt_p"		"Expira"
+		"ru"		"Истекает"
+		"es"		"Expira"
+		"ua"		"Закінчується"
+	}
+
+	"PANEL_BACK"
+	{
+		"en"	"Back"
+	}
+
+	"PANEL_CLOSE"
+	{
+		"en"	"Close"
+	}
+}
