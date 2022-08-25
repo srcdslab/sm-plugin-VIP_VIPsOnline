@@ -21,40 +21,38 @@
 		1.0.0 -	Релиз
 		1.0.1 -	Кнопка "Назад" изменена из 1 на 8
 				Исправлено закрытие меню при нажатии "Назад"
+		1.0.2 - Update syntax to SM 1.11
 */
 #pragma semicolon 1
+#pragma newdecls required
 
 #include <sourcemod>
 #include <vip_core>
 
-public Plugin:myinfo =
+public Plugin myinfo =
 {
 	name = "[VIP] VIPs Online",
 	author = "R1KO (skype: vova.andrienko1)",
 	description = "Display the list of active vips",
-	version = "1.0.1",
+	version = "1.0.2",
 	url = "hlmod.ru"
-};
+}
 
-new bool:g_bShowGroup,
-	bool:g_bShowExpired;
+bool g_bShowGroup;
+bool g_bShowExpired;
 
-public OnPluginStart()
+public void OnPluginStart()
 {
-	decl Handle:hCvar;
+	ConVar hCvar = CreateConVar("vip_vo_show_group", "1", "Показывать ли VIP-группу при нажатии на игрока (0 - Отключено)", 0, true, 0.0, true, 1.0);
+	hCvar.AddChangeHook(OnShowGroupChange);
+	g_bShowGroup = hCvar.BoolValue;
 
-	hCvar = CreateConVar("vip_vo_show_group", "1", "Показывать ли VIP-группу при нажатии на игрока (0 - Отключено)", 0, true, 0.0, true, 1.0);
-	HookConVarChange(hCvar, OnShowGroupChange);
-	g_bShowGroup = GetConVarBool(hCvar);
-
-	hCvar = CreateConVar("vip_vo_show_expired", "1", "Показывать ли время окончания VIP-статуса при нажатии на игрока (0 - Отключено)", 0, true, 0.0, true, 1.0);
-	HookConVarChange(hCvar, OnShowExpiredChange);
-	g_bShowExpired = GetConVarBool(hCvar);
+	ConVar hCvar1 = CreateConVar("vip_vo_show_expired", "1", "Показывать ли время окончания VIP-статуса при нажатии на игрока (0 - Отключено)", 0, true, 0.0, true, 1.0);
+	hCvar.AddChangeHook(OnShowExpiredChange);
+	g_bShowExpired = hCvar1.BoolValue;
 
 	AutoExecConfig(true, "vips_online", "vip");
 
-	CloseHandle(hCvar);
-	
 	RegConsoleCmd("sm_viplist", VIPList_CMD);
 	RegConsoleCmd("sm_vips", VIPList_CMD);
 	RegConsoleCmd("sm_випс", VIPList_CMD);
@@ -63,19 +61,26 @@ public OnPluginStart()
 	LoadTranslations("vip_core.phrases");
 }
 
-public OnShowGroupChange(Handle:hCvar, const String:oldValue[], const String:newValue[])		g_bShowGroup = GetConVarBool(hCvar);
-public OnShowExpiredChange(Handle:hCvar, const String:oldValue[], const String:newValue[])		g_bShowExpired = GetConVarBool(hCvar);
+public void OnShowGroupChange(ConVar convar, const char[] oldValue, const char[] newValue)
+{	
+    g_bShowGroup = convar.BoolValue;
+}
+public void OnShowExpiredChange(ConVar convar, const char[] oldValue, const char[] newValue)
+{	
+    g_bShowExpired = convar.BoolValue;
+}
 
-public Action:VIPList_CMD(iClient, args)
+public Action VIPList_CMD(int iClient, int args)
 {
 	if(iClient)
 	{
-		decl Handle:hMenu, String:sName[64], String:sBuffer[16], i;
+		Handle hMenu;
+		char sName[64], sBuffer[16];
 		hMenu = CreateMenu(Handler_VIPListMenu);
 		SetMenuTitle(hMenu, "%T:\n \n", "VIP_PLAYERS_ONLINE", iClient);
 
 		sBuffer[0] = '\0';
-		for (i = 1; i <= MaxClients; ++i)
+		for (int i = 1; i <= MaxClients; i++)
 		{
 			if (IsClientInGame(i) && VIP_IsClientVIP(i) && GetClientName(i, sName, sizeof(sName)))
 			{
@@ -96,7 +101,7 @@ public Action:VIPList_CMD(iClient, args)
 	return Plugin_Handled;
 }
 
-public Handler_VIPListMenu(Handle:hMenu, MenuAction:action, iClient, iOption)
+public int Handler_VIPListMenu(Handle hMenu, MenuAction action, int iClient, int iOption)
 {
 	switch(action)
 	{
@@ -108,7 +113,9 @@ public Handler_VIPListMenu(Handle:hMenu, MenuAction:action, iClient, iOption)
 		{
 			if(g_bShowGroup || g_bShowExpired)
 			{
-				decl Handle:hPanel, String:sBuffer[64], iTarget;
+				Handle hPanel;
+				char sBuffer[64];
+				int iTarget;
 				GetMenuItem(hMenu, iOption, sBuffer, sizeof(sBuffer));
 				hPanel = CreatePanel();
 				SetGlobalTransTarget(iClient);
@@ -133,7 +140,7 @@ public Handler_VIPListMenu(Handle:hMenu, MenuAction:action, iClient, iOption)
 					{
 						FormatEx(sBuffer, sizeof(sBuffer), "%t:", "EXPIRES");
 						DrawPanelText(hPanel, sBuffer);
-						new iExpire = VIP_GetClientAccessTime(iTarget);
+						int iExpire = VIP_GetClientAccessTime(iTarget);
 						if(iExpire == -1)
 						{
 							FormatEx(sBuffer, sizeof(sBuffer), "%t", "TEMPORARY");
@@ -146,7 +153,7 @@ public Handler_VIPListMenu(Handle:hMenu, MenuAction:action, iClient, iOption)
 						}
 						else
 						{
-							decl String:sTimeEnd[128];
+							char sTimeEnd[128];
 							if(VIP_GetTimeFromStamp(sTimeEnd, sizeof(sTimeEnd), iExpire-GetTime(), iClient))
 							{
 								Format(sTimeEnd, sizeof(sTimeEnd), "%t %s", "EXPIRE", sTimeEnd);
@@ -193,12 +200,16 @@ public Handler_VIPListMenu(Handle:hMenu, MenuAction:action, iClient, iOption)
 			}
 		}
 	}
+	
+	return 0;
 }
 
-public Handler_InfoMenu(Handle:hMenu, MenuAction:action, iClient, iOption)
+public int Handler_InfoMenu(Handle hMenu, MenuAction action, int iClient, int iOption)
 {
 	if(action == MenuAction_Select && iOption == 8)
 	{
 		VIPList_CMD(iClient, 0);
 	}
+	
+	return 0;
 }
