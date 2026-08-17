@@ -10,9 +10,9 @@ This repository contains a SourcePawn plugin for SourceMod that provides VIP pla
 
 ## Technical Environment
 - **Language**: SourcePawn
-- **Platform**: SourceMod 1.11+ (currently uses 1.11.0-git6917)
-- **Build System**: SourceKnight (modern build tool for SourceMod plugins)
-- **Compiler**: SourcePawn compiler (spcomp) via SourceKnight
+- **Platform**: SourceMod 1.12+
+- **Build System**: Native GitHub Actions (rumblefrog/setup-sp)
+- **Compiler**: SourcePawn compiler (spcomp) via GitHub Actions
 - **CI/CD**: GitHub Actions with automated building and releases
 
 ## Project Structure
@@ -26,26 +26,20 @@ addons/sourcemod/
 ```
 
 **Key Files**:
-- `sourceknight.yaml` - Build configuration and dependencies
-- `.github/workflows/ci.yml` - CI/CD pipeline configuration
+- `.github/workflows/ci.yml` - CI/CD pipeline configuration and build/dependency setup
 - `addons/sourcemod/scripting/VIP_VIPsOnline.sp` - Main plugin implementation
 
 ## Build & Development Process
 
 ### Building the Plugin
-```bash
-# Install SourceKnight if not available
-pip install sourceknight
+The plugin is built via GitHub Actions (`.github/workflows/ci.yml`):
+- Sets up the SourcePawn compiler with `rumblefrog/setup-sp` (SourceMod 1.12.x)
+- Clones the VIP Core dependency and copies its include files
+- Compiles `VIP_VIPsOnline.sp` with `spcomp` to `addons/sourcemod/plugins/VIP_VIPsOnline.smx`
 
-# Build the plugin
-sourceknight build
-```
-
-The build system automatically:
-- Downloads and sets up SourceMod 1.11.0-git6917
-- Downloads VIP Core dependency from GitHub
-- Compiles the plugin to `.smx` format
-- Outputs compiled plugin to `addons/sourcemod/plugins/`
+To build locally, install a SourcePawn compiler matching SourceMod 1.12.x, place VIP Core's
+`include` files under `addons/sourcemod/scripting/include/`, and run `spcomp` against
+`VIP_VIPsOnline.sp` from `addons/sourcemod/scripting/`.
 
 ### Testing
 - Deploy to a test SourceMod server with VIP Core installed
@@ -133,7 +127,7 @@ This plugin depends on VIP Core functionality:
 - **SourceMod**: Core modding framework (1.11+ required)
 - **VIP Core**: Required dependency for VIP functionality
   - Repository: https://github.com/srcdslab/sm-plugin-VIP-Core
-  - Automatically managed via SourceKnight build system
+  - Automatically cloned and managed via GitHub Actions CI
 
 ## Performance Considerations
 - Minimize operations in frequently called functions
