@@ -48,7 +48,7 @@ public void OnPluginStart()
 	g_bShowGroup = hCvar.BoolValue;
 
 	ConVar hCvar1 = CreateConVar("vip_vo_show_expired", "1", "Показывать ли время окончания VIP-статуса при нажатии на игрока (0 - Отключено)", 0, true, 0.0, true, 1.0);
-	hCvar.AddChangeHook(OnShowExpiredChange);
+	hCvar1.AddChangeHook(OnShowExpiredChange);
 	g_bShowExpired = hCvar1.BoolValue;
 
 	AutoExecConfig(true, "vips_online", "vip");
