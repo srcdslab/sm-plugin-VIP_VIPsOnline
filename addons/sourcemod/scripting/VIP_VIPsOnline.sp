@@ -23,6 +23,7 @@
 				Исправлено закрытие меню при нажатии "Назад"
 		1.0.2 - Update syntax to SM 1.11
 		1.0.3 - Minor convar fix
+		1.0.4 - Fix and complete translations
 */
 #pragma semicolon 1
 #pragma newdecls required
@@ -35,7 +36,7 @@ public Plugin myinfo =
 	name = "[VIP] VIPs Online",
 	author = "R1KO (skype: vova.andrienko1)",
 	description = "Display the list of active vips",
-	version = "1.0.3",
+	version = "1.0.4",
 	url = "hlmod.ru"
 }
 
