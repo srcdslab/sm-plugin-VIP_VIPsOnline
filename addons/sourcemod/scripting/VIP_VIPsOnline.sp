@@ -36,7 +36,7 @@ public Plugin myinfo =
 	name = "[VIP] VIPs Online",
 	author = "R1KO (skype: vova.andrienko1)",
 	description = "Display the list of active vips",
-	version = "1.0.4",
+	version = "1.0.5",
 	url = "hlmod.ru"
 }
 
@@ -76,10 +76,10 @@ public Action VIPList_CMD(int iClient, int args)
 {
 	if(iClient)
 	{
-		Handle hMenu;
+		Menu hMenu;
 		char sName[64], sBuffer[16];
-		hMenu = CreateMenu(Handler_VIPListMenu);
-		SetMenuTitle(hMenu, "%T:\n \n", "VIP_PLAYERS_ONLINE", iClient);
+		hMenu = new Menu(Handler_VIPListMenu);
+		hMenu.SetTitle("%T:\n \n", "VIP_PLAYERS_ONLINE", iClient);
 
 		sBuffer[0] = '\0';
 		for (int i = 1; i <= MaxClients; i++)
@@ -87,71 +87,71 @@ public Action VIPList_CMD(int iClient, int args)
 			if (IsClientInGame(i) && VIP_IsClientVIP(i) && GetClientName(i, sName, sizeof(sName)))
 			{
 				IntToString(GetClientUserId(i), sBuffer, sizeof(sBuffer));
-				AddMenuItem(hMenu, sBuffer, sName);
+				hMenu.AddItem(sBuffer, sName);
 			}
 		}
 		
 		if(sBuffer[0] == '\0')
 		{
 			FormatEx(sName, sizeof(sName), "%T", "NO_VIP_PLAYERS_ONLINE", iClient);
-			AddMenuItem(hMenu, "", sName, ITEMDRAW_DISABLED);
+			hMenu.AddItem("", sName, ITEMDRAW_DISABLED);
 		}
 
-		DisplayMenu(hMenu, iClient, 30);
+		hMenu.Display(iClient, 30);
 	}
 
 	return Plugin_Handled;
 }
 
-public int Handler_VIPListMenu(Handle hMenu, MenuAction action, int iClient, int iOption)
+public int Handler_VIPListMenu(Menu hMenu, MenuAction action, int iClient, int iOption)
 {
 	switch(action)
 	{
 		case MenuAction_End:
 		{
-			CloseHandle(hMenu);
+			delete hMenu;
 		}
 		case MenuAction_Select:
 		{
 			if(g_bShowGroup || g_bShowExpired)
 			{
-				Handle hPanel;
+				Panel hPanel;
 				char sBuffer[64];
 				int iTarget;
-				GetMenuItem(hMenu, iOption, sBuffer, sizeof(sBuffer));
-				hPanel = CreatePanel();
+				hMenu.GetItem(iOption, sBuffer, sizeof(sBuffer));
+				hPanel = new Panel();
 				SetGlobalTransTarget(iClient);
 				iTarget = GetClientOfUserId(StringToInt(sBuffer));
 				if(iTarget)
 				{
 					FormatEx(sBuffer, sizeof(sBuffer), "%t\n \n", "INFO");
-					SetPanelTitle(hPanel, sBuffer);
+					hPanel.SetTitle(sBuffer);
 					if(g_bShowGroup)
 					{
 						FormatEx(sBuffer, sizeof(sBuffer), "%t:", "GROUP");
-						DrawPanelText(hPanel, sBuffer);
+						hPanel.DrawText(sBuffer);
 						if(VIP_GetClientVIPGroup(iTarget, sBuffer, sizeof(sBuffer)))
 						{
-							DrawPanelText(hPanel, sBuffer);
+							hPanel.DrawText(sBuffer);
 						}
 
-						DrawPanelText(hPanel, " \n");
+						hPanel.DrawText(" \n");
 					}
 					
 					if(g_bShowExpired)
 					{
 						FormatEx(sBuffer, sizeof(sBuffer), "%t:", "EXPIRES");
-						DrawPanelText(hPanel, sBuffer);
+						hPanel.DrawText(sBuffer);
 						int iExpire = VIP_GetClientAccessTime(iTarget);
 						if(iExpire == -1)
 						{
 							FormatEx(sBuffer, sizeof(sBuffer), "%t", "TEMPORARY");
-							DrawPanelText(hPanel, sBuffer);
+							hPanel.DrawText(sBuffer);
 						}
 						else if(iExpire == 0)
 						{
 							FormatEx(sBuffer, sizeof(sBuffer), "%t", "NEVER");
-							DrawPanelText(hPanel, sBuffer);
+							hPanel.DrawText(sBuffer);
 						}
 						else
 						{
@@ -164,37 +164,37 @@ public int Handler_VIPListMenu(Handle hMenu, MenuAction action, int iClient, int
 							{
 								FormatEx(sTimeEnd, sizeof(sTimeEnd), "%t", "ERROR");
 							}
-							DrawPanelText(hPanel, sTimeEnd);
+							hPanel.DrawText(sTimeEnd);
 						}
 						
-						DrawPanelText(hPanel, " \n");
+						hPanel.DrawText(" \n");
 					}
 				}
 				else
 				{
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "ERROR");
-					SetPanelTitle(hPanel, sBuffer);
+					hPanel.SetTitle(sBuffer);
 
 					FormatEx(sBuffer, sizeof(sBuffer), "%t", "PLAYER_NO_LONGER_AVAILABLE");
-					DrawPanelText(hPanel, sBuffer);
+					hPanel.DrawText(sBuffer);
 					
-					DrawPanelText(hPanel, " \n");
+					hPanel.DrawText(" \n");
 				}
 
-				DrawPanelText(hPanel, " \n");
+				hPanel.DrawText(" \n");
 
 				FormatEx(sBuffer, sizeof(sBuffer), "%t", "PANEL_BACK");
-				SetPanelCurrentKey(hPanel, 8);
-				DrawPanelItem(hPanel, sBuffer, ITEMDRAW_CONTROL);
+				hPanel.CurrentKey = 8;
+				hPanel.DrawItem(sBuffer, ITEMDRAW_CONTROL);
 
-				DrawPanelItem(hPanel, " ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
+				hPanel.DrawItem(" ", ITEMDRAW_SPACER|ITEMDRAW_RAWLINE);
 				
 				FormatEx(sBuffer, sizeof(sBuffer), "%t", "PANEL_CLOSE");
-				SetPanelCurrentKey(hPanel, 10);
-				DrawPanelItem(hPanel, sBuffer, ITEMDRAW_CONTROL);
+				hPanel.CurrentKey = 10;
+				hPanel.DrawItem(sBuffer, ITEMDRAW_CONTROL);
 				
-				SendPanelToClient(hPanel, iClient, Handler_InfoMenu, 30);
-				CloseHandle(hPanel);
+				hPanel.Send(iClient, Handler_InfoMenu, 30);
+				delete hPanel;
 			}
 			else
 			{
@@ -206,7 +206,7 @@ public int Handler_VIPListMenu(Handle hMenu, MenuAction action, int iClient, int
 	return 0;
 }
 
-public int Handler_InfoMenu(Handle hMenu, MenuAction action, int iClient, int iOption)
+public int Handler_InfoMenu(Menu hMenu, MenuAction action, int iClient, int iOption)
 {
 	if(action == MenuAction_Select && iOption == 8)
 	{
