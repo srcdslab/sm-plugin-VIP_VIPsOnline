@@ -4,7 +4,7 @@
 	{
 		"en"	"VIP-players online"
 		"fi"	"VIP pelaajat verkossa"
-		"de"	"VIP Spieler online"
+		"de"	"VIP-Spieler online"
 		"pt_p"	"Jogadores VIP online"
 		"ru"	"VIP-игроки онлайн"
 		"es"	"Jugadores VIP en línea"
@@ -30,7 +30,7 @@
 		"sv"	"VIP-spelare online"
 		"tr"	"VIP oyuncular çevrimiçi"
 		"vi"	"Người chơi VIP trực tuyến"
-		"zho"	"VIP 玩家在线"
+		"zho"	"VIP 玩家在線"
 		"he"	"שחקני VIP מחוברים"
 	}
 
@@ -81,7 +81,7 @@
 		"ar"	"الرجوع"
 		"bg"	"Назад"
 		"chi"	"返回"
-		"cze"	"Zpet"
+		"cze"	"Zpět"
 		"da"	"Tilbage"
 		"el"	"Πίσω"
 		"hu"	"Vissza"
@@ -106,7 +106,7 @@
 	{
 		"en"	"Close"
 		"fi"	"Poistu"
-		"de"	"Verlassen"
+		"de"	"Schließen"
 		"pt_p"	"Sair"
 		"ru"	"Выход"
 		"es"	"Salir"
@@ -115,7 +115,7 @@
 		"ar"	"الخروج"
 		"bg"	"Изход"
 		"chi"	"退出"
-		"cze"	"Exit"
+		"cze"	"Zavřít"
 		"da"	"Afslut"
 		"el"	"Έξοδος"
 		"hu"	"Kilépés"
