@@ -36,7 +36,7 @@ public Plugin myinfo =
 	name = "[VIP] VIPs Online",
 	author = "R1KO (skype: vova.andrienko1)",
 	description = "Display the list of active vips",
-	version = "1.0.6",
+	version = "1.0.7",
 	url = "hlmod.ru"
 }
 
